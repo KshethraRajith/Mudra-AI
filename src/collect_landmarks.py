@@ -1,24 +1,35 @@
 import cv2
 import csv
 import os
-import time
 import mediapipe as mp
 
-# -----------------------------
+# =========================
 # SETTINGS
-# -----------------------------
-
-LABEL = "pataaka"
-SAMPLES = 500
-SAVE_INTERVAL = 0.15  # seconds between samples
+# =========================
 
 MODEL_PATH = "models/hand_landmarker.task"
-OUTPUT_DIR = "data/raw"
-OUTPUT_FILE = os.path.join(OUTPUT_DIR, "pataaka_landmarks.csv")
+OUTPUT_FILE = "data/raw/mudra_landmarks.csv"
 
-# -----------------------------
+SAMPLES_TO_COLLECT = 1000
+
+# =========================
+# ASK FOR MUDRA LABEL
+# =========================
+
+label = input("Enter mudra label: ").strip().lower()
+
+if not label:
+    print("Error: Mudra label cannot be empty.")
+    exit()
+
+print(f"\nCollecting samples for: {label}")
+print(f"Target samples: {SAMPLES_TO_COLLECT}")
+print("Press SPACE to start/pause collection.")
+print("Press Q to quit.\n")
+
+# =========================
 # MEDIAPIPE SETUP
-# -----------------------------
+# =========================
 
 BaseOptions = mp.tasks.BaseOptions
 HandLandmarker = mp.tasks.vision.HandLandmarker
@@ -26,170 +37,113 @@ HandLandmarkerOptions = mp.tasks.vision.HandLandmarkerOptions
 VisionRunningMode = mp.tasks.vision.RunningMode
 
 options = HandLandmarkerOptions(
-    base_options=BaseOptions(
-        model_asset_path=MODEL_PATH
-    ),
+    base_options=BaseOptions(model_asset_path=MODEL_PATH),
     running_mode=VisionRunningMode.IMAGE,
     num_hands=1
 )
 
-landmarker = HandLandmarker.create_from_options(options)
-
-# -----------------------------
-# CREATE OUTPUT FOLDER
-# -----------------------------
-
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-# -----------------------------
+# =========================
 # CSV SETUP
-# -----------------------------
+# =========================
 
-header = ["label"]
-
-for i in range(21):
-    header.extend([
-        f"x{i}",
-        f"y{i}",
-        f"z{i}"
-    ])
+os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
 
 file_exists = os.path.exists(OUTPUT_FILE)
 
-csv_file = open(
-    OUTPUT_FILE,
-    "a",
-    newline=""
-)
+csv_file = open(OUTPUT_FILE, "a", newline="")
 
 writer = csv.writer(csv_file)
 
 if not file_exists:
+    header = ["label"]
+
+    for i in range(21):
+        header.extend([
+            f"x{i}",
+            f"y{i}",
+            f"z{i}"
+        ])
+
     writer.writerow(header)
 
-# -----------------------------
+# =========================
 # CAMERA
-# -----------------------------
+# =========================
 
-camera = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0)
 
-if not camera.isOpened():
-    print("❌ Could not open camera")
+if not cap.isOpened():
+    print("Error: Could not open camera.")
+    csv_file.close()
     exit()
 
-print()
-print("================================")
-print("     PATAAKA DATA COLLECTION")
-print("================================")
-print()
-print("Hold the Pataaka mudra in front")
-print("of the camera.")
-print()
-print("Press SPACE to start collecting.")
-print("Press Q to quit.")
-print()
-
 collecting = False
-sample_count = 0
-last_saved = 0
+count = 0
 
-while True:
+with HandLandmarker.create_from_options(options) as landmarker:
 
-    ret, frame = camera.read()
+    while cap.isOpened():
 
-    if not ret:
-        print("❌ Could not read camera frame")
-        break
+        ret, frame = cap.read()
 
-    rgb_frame = cv2.cvtColor(
-        frame,
-        cv2.COLOR_BGR2RGB
-    )
+        if not ret:
+            print("Failed to read camera.")
+            break
 
-    mp_image = mp.Image(
-        image_format=mp.ImageFormat.SRGB,
-        data=rgb_frame
-    )
+        # Mirror camera
+        frame = cv2.flip(frame, 1)
 
-    result = landmarker.detect(mp_image)
+        # Convert BGR -> RGB
+        rgb_frame = cv2.cvtColor(
+            frame,
+            cv2.COLOR_BGR2RGB
+        )
 
-    # -----------------------------
-    # DRAW HAND
-    # -----------------------------
+        # MediaPipe image
+        mp_image = mp.Image(
+            image_format=mp.ImageFormat.SRGB,
+            data=rgb_frame
+        )
 
-    if result.hand_landmarks:
+        # Detect hand
+        result = landmarker.detect(mp_image)
 
-        hand_landmarks = result.hand_landmarks[0]
+        # =========================
+        # HAND DETECTED
+        # =========================
 
-        # Draw points
-        for landmark in hand_landmarks:
+        if result.hand_landmarks:
 
-            x = int(landmark.x * frame.shape[1])
-            y = int(landmark.y * frame.shape[0])
+            hand = result.hand_landmarks[0]
 
-            cv2.circle(
-                frame,
-                (x, y),
-                5,
-                (0, 255, 0),
-                -1
-            )
+            # Draw the 21 landmarks
+            for landmark in hand:
 
-        # Draw connections
-        connections = [
-            (0, 1), (1, 2), (2, 3), (3, 4),
-            (0, 5), (5, 6), (6, 7), (7, 8),
-            (0, 9), (9, 10), (10, 11), (11, 12),
-            (0, 13), (13, 14), (14, 15), (15, 16),
-            (0, 17), (17, 18), (18, 19), (19, 20),
-            (5, 9), (9, 13), (13, 17)
-        ]
+                x = int(
+                    landmark.x * frame.shape[1]
+                )
 
-        for start, end in connections:
+                y = int(
+                    landmark.y * frame.shape[0]
+                )
 
-            x1 = int(
-                hand_landmarks[start].x
-                * frame.shape[1]
-            )
-            y1 = int(
-                hand_landmarks[start].y
-                * frame.shape[0]
-            )
+                cv2.circle(
+                    frame,
+                    (x, y),
+                    4,
+                    (0, 255, 0),
+                    -1
+                )
 
-            x2 = int(
-                hand_landmarks[end].x
-                * frame.shape[1]
-            )
-            y2 = int(
-                hand_landmarks[end].y
-                * frame.shape[0]
-            )
+            # =========================
+            # COLLECT DATA
+            # =========================
 
-            cv2.line(
-                frame,
-                (x1, y1),
-                (x2, y2),
-                (0, 255, 0),
-                2
-            )
+            if collecting and count < SAMPLES_TO_COLLECT:
 
-        # -----------------------------
-        # COLLECT DATA
-        # -----------------------------
+                row = [label]
 
-        if collecting:
-
-            current_time = time.time()
-
-            if (
-                current_time - last_saved
-                >= SAVE_INTERVAL
-                and sample_count < SAMPLES
-            ):
-
-                row = [LABEL]
-
-                for landmark in hand_landmarks:
+                for landmark in hand:
 
                     row.extend([
                         landmark.x,
@@ -200,73 +154,78 @@ while True:
                 writer.writerow(row)
                 csv_file.flush()
 
-                sample_count += 1
-                last_saved = current_time
+                count += 1
 
-    # -----------------------------
-    # DISPLAY STATUS
-    # -----------------------------
+        # =========================
+        # DISPLAY STATUS
+        # =========================
 
-    if not collecting:
+        if collecting:
+            status = f"COLLECTING: {count}/{SAMPLES_TO_COLLECT}"
+            color = (0, 255, 0)
+        else:
+            status = "PAUSED - Press SPACE"
+            color = (0, 255, 255)
 
         cv2.putText(
             frame,
-            "Press SPACE to start",
+            f"Mudra: {label}",
             (20, 40),
             cv2.FONT_HERSHEY_SIMPLEX,
             1,
-            (0, 255, 255),
+            color,
             2
         )
-
-    else:
 
         cv2.putText(
             frame,
-            f"Pataaka samples: {sample_count}/{SAMPLES}",
-            (20, 40),
+            status,
+            (20, 80),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.8,
-            (0, 255, 0),
+            color,
             2
         )
 
-    cv2.imshow(
-        "Mudra-AI Pataaka Dataset Collector",
-        frame
-    )
+        cv2.imshow(
+            "Mudra-AI Landmark Collection",
+            frame
+        )
 
-    key = cv2.waitKey(1) & 0xFF
+        # =========================
+        # KEYBOARD CONTROLS
+        # =========================
 
-    # SPACE → start
-    if key == ord(" "):
+        key = cv2.waitKey(1) & 0xFF
 
-        if not collecting:
-            collecting = True
-            print("🟢 Collection started!")
+        if key == ord(" "):
+            collecting = not collecting
 
-    # Q → quit
-    elif key == ord("q"):
-        break
+        elif key == ord("q"):
+            break
 
-    # Stop automatically
-    if sample_count >= SAMPLES:
+        # =========================
+        # FINISHED
+        # =========================
 
-        print()
-        print("✅ 500 Pataaka samples collected!")
-        break
+        if count >= SAMPLES_TO_COLLECT:
 
+            collecting = False
 
-camera.release()
+            print(
+                f"\nFinished collecting {count} "
+                f"samples for '{label}'."
+            )
+
+            break
+
+# =========================
+# CLEANUP
+# =========================
+
 csv_file.close()
-landmarker.close()
-
+cap.release()
 cv2.destroyAllWindows()
 
-print()
-print("================================")
-print("      COLLECTION COMPLETE")
-print("================================")
-print(f"Dataset saved to:")
-print(OUTPUT_FILE)
-print()
+print(f"\nSaved {count} samples for '{label}'")
+print(f"File: {OUTPUT_FILE}")
