@@ -16,28 +16,24 @@ MODEL_PATH = "models/mudra_classifier.pkl"
 
 
 # =============================
-# NORMALIZE LANDMARKS
+# LANDMARK NORMALIZATION
 # =============================
 
 def normalize_landmarks(row):
     """
     Normalize 21 hand landmarks.
 
-    Landmark 0 is the wrist.
-    All landmarks are shifted relative to the wrist
-    and scaled based on the size of the hand.
+    Landmark 0 (wrist) becomes the origin.
+    Coordinates are then scaled based on hand size.
     """
 
-    landmarks = row.reshape(21, 3)
+    landmarks = row.values.astype(float).reshape(21, 3)
 
-    # Use wrist as origin
-    wrist = landmarks[0]
-
-    landmarks = landmarks - wrist
+    # Wrist becomes origin
+    landmarks = landmarks - landmarks[0]
 
     # Calculate hand size
     distances = np.linalg.norm(landmarks, axis=1)
-
     scale = np.max(distances)
 
     # Avoid division by zero
@@ -48,7 +44,7 @@ def normalize_landmarks(row):
 
 
 # =============================
-# 1. LOAD DATASET
+# LOAD DATASET
 # =============================
 
 df = pd.read_csv(DATA_PATH)
@@ -58,10 +54,10 @@ print(f"Columns: {len(df.columns)}")
 
 
 # =============================
-# 2. SEPARATE FEATURES/LABELS
+# SEPARATE FEATURES / LABEL
 # =============================
 
-X_raw = df.drop(columns=["label"]).values
+X_raw = df.drop(columns=["label"])
 y = df["label"]
 
 print("\nClasses:")
@@ -69,21 +65,21 @@ print(y.value_counts())
 
 
 # =============================
-# 3. NORMALIZE FEATURES
+# NORMALIZE FEATURES
 # =============================
 
 print("\nNormalizing landmarks...")
 
 X = np.array([
     normalize_landmarks(row)
-    for row in X_raw
+    for _, row in X_raw.iterrows()
 ])
 
-print("Normalization completed!")
+print(f"Normalized feature shape: {X.shape}")
 
 
 # =============================
-# 4. SPLIT DATASET
+# TRAIN / TEST SPLIT
 # =============================
 
 X_train, X_test, y_train, y_test = train_test_split(
@@ -99,7 +95,7 @@ print(f"Testing samples: {len(X_test)}")
 
 
 # =============================
-# 5. CREATE CLASSIFIER
+# CREATE CLASSIFIER
 # =============================
 
 model = RandomForestClassifier(
@@ -110,7 +106,7 @@ model = RandomForestClassifier(
 
 
 # =============================
-# 6. TRAIN MODEL
+# TRAIN MODEL
 # =============================
 
 print("\nTraining model...")
@@ -121,7 +117,7 @@ print("Training completed!")
 
 
 # =============================
-# 7. EVALUATE MODEL
+# EVALUATE MODEL
 # =============================
 
 y_pred = model.predict(X_test)
@@ -135,7 +131,7 @@ print(classification_report(y_test, y_pred))
 
 
 # =============================
-# 8. SAVE MODEL
+# SAVE MODEL
 # =============================
 
 joblib.dump(model, MODEL_PATH)

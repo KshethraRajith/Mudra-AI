@@ -3,7 +3,6 @@ import joblib
 import mediapipe as mp
 import numpy as np
 
-
 # =========================
 # SETTINGS
 # =========================
@@ -13,28 +12,27 @@ HAND_MODEL_PATH = "models/hand_landmarker.task"
 
 
 # =========================
-# NORMALIZE LANDMARKS
+# LANDMARK NORMALIZATION
 # =========================
 
 def normalize_landmarks(hand):
     """
-    Normalize MediaPipe hand landmarks
-    using the wrist as the origin.
+    Normalize 21 hand landmarks.
+
+    Landmark 0 (wrist) becomes the origin.
+    Coordinates are scaled based on hand size.
     """
 
-    landmarks = np.array([
-        [landmark.x, landmark.y, landmark.z]
-        for landmark in hand
-    ])
+    landmarks = np.array(
+        [[lm.x, lm.y, lm.z] for lm in hand],
+        dtype=float
+    )
 
-    # Use wrist as origin
-    wrist = landmarks[0]
-
-    landmarks = landmarks - wrist
+    # Make wrist the origin
+    landmarks = landmarks - landmarks[0]
 
     # Calculate hand size
     distances = np.linalg.norm(landmarks, axis=1)
-
     scale = np.max(distances)
 
     # Avoid division by zero
@@ -86,6 +84,10 @@ print("Camera started.")
 print("Press Q to quit.")
 
 
+# =========================
+# LIVE PREDICTION
+# =========================
+
 with HandLandmarker.create_from_options(options) as landmarker:
 
     while cap.isOpened():
@@ -123,11 +125,7 @@ with HandLandmarker.create_from_options(options) as landmarker:
 
             hand = result.hand_landmarks[0]
 
-
-            # =========================
-            # DRAW LANDMARKS
-            # =========================
-
+            # Draw landmarks
             for landmark in hand:
 
                 x = int(
@@ -148,7 +146,7 @@ with HandLandmarker.create_from_options(options) as landmarker:
 
 
             # =========================
-            # CREATE NORMALIZED FEATURES
+            # NORMALIZE FEATURES
             # =========================
 
             features = normalize_landmarks(hand)
