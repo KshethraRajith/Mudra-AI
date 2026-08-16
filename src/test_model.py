@@ -2,6 +2,7 @@ import cv2
 import joblib
 import mediapipe as mp
 import numpy as np
+from collections import deque
 
 # =========================
 # SETTINGS
@@ -10,18 +11,18 @@ import numpy as np
 MODEL_PATH = "models/mudra_classifier.pkl"
 HAND_MODEL_PATH = "models/hand_landmarker.task"
 
+# Minimum confidence required
+CONFIDENCE_THRESHOLD = 50.0
+
+# Number of recent predictions used for smoothing
+SMOOTHING_WINDOW = 7
+
 
 # =========================
 # LANDMARK NORMALIZATION
 # =========================
 
 def normalize_landmarks(hand):
-    """
-    Normalize 21 hand landmarks.
-
-    Landmark 0 (wrist) becomes the origin.
-    Coordinates are scaled based on hand size.
-    """
 
     landmarks = np.array(
         [[lm.x, lm.y, lm.z] for lm in hand],
@@ -43,7 +44,7 @@ def normalize_landmarks(hand):
 
 
 # =========================
-# LOAD TRAINED MODEL
+# LOAD MODEL
 # =========================
 
 model = joblib.load(MODEL_PATH)
@@ -82,6 +83,15 @@ if not cap.isOpened():
 
 print("Camera started.")
 print("Press Q to quit.")
+
+
+# =========================
+# PREDICTION HISTORY
+# =========================
+
+prediction_history = deque(maxlen=SMOOTHING_WINDOW)
+
+stable_prediction = "Detecting..."
 
 
 # =========================
@@ -125,7 +135,11 @@ with HandLandmarker.create_from_options(options) as landmarker:
 
             hand = result.hand_landmarks[0]
 
-            # Draw landmarks
+
+            # =========================
+            # DRAW LANDMARKS
+            # =========================
+
             for landmark in hand:
 
                 x = int(
@@ -155,7 +169,7 @@ with HandLandmarker.create_from_options(options) as landmarker:
 
 
             # =========================
-            # PREDICTION
+            # MODEL PREDICTION
             # =========================
 
             prediction = model.predict(X)[0]
@@ -166,12 +180,38 @@ with HandLandmarker.create_from_options(options) as landmarker:
 
 
             # =========================
+            # CONFIDENCE CHECK
+            # =========================
+
+            if confidence >= CONFIDENCE_THRESHOLD:
+
+                prediction_history.append(prediction)
+
+                # Find most common prediction
+                counts = {}
+
+                for p in prediction_history:
+                    counts[p] = counts.get(p, 0) + 1
+
+                stable_prediction = max(
+                    counts,
+                    key=counts.get
+                )
+
+            else:
+
+                # Keep the previous stable prediction
+                # during brief low-confidence frames.
+                pass
+
+
+            # =========================
             # DISPLAY
             # =========================
 
             cv2.putText(
                 frame,
-                f"Mudra: {prediction}",
+                f"Mudra: {stable_prediction}",
                 (20, 45),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 1,
@@ -190,11 +230,19 @@ with HandLandmarker.create_from_options(options) as landmarker:
             )
 
 
+        # =========================
+        # NO HAND
+        # =========================
+
         else:
+
+            prediction_history.clear()
+
+            stable_prediction = "No hand detected"
 
             cv2.putText(
                 frame,
-                "No hand detected",
+                stable_prediction,
                 (20, 45),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 1,
