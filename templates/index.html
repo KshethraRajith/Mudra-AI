@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mudra-AI</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            text-align: center;
+        }
+
+        header {
+            background: #222;
+            color: white;
+            padding: 25px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+
+        header p {
+            margin: 8px 0 0;
+            font-size: 18px;
+        }
+
+        .container {
+            margin: 40px auto;
+            max-width: 900px;
+        }
+
+        .camera-box {
+            background: black;
+            border-radius: 15px;
+            overflow: hidden;
+            width: 100%;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        video {
+            width: 100%;
+            display: block;
+        }
+
+        button {
+            margin-top: 25px;
+            padding: 12px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            background: #222;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #444;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>🖐️ Mudra-AI</h1>
+        <p>Bharatanatyam Mudra Recognition</p>
+    </header>
+
+    <div class="container">
+
+        <div class="camera-box">
+            <video id="video" autoplay playsinline></video>
+        </div>
+
+        <button onclick="startCamera()">
+            Start Camera
+        </button>
+
+    </div>
+
+    <script>
+
+        async function startCamera() {
+
+            try {
+
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: true
+                });
+
+                const video = document.getElementById("video");
+
+                video.srcObject = stream;
+
+            } catch (error) {
+
+                alert("Could not access camera.");
+
+                console.error(error);
+            }
+        }
+
+    </script>
+
+</body>
+</html>
