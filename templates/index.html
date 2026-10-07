@@ -4,110 +4,211 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Mudra-AI</title>
+    <title>Mudra-AI | Bharatanatyam Recognition</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            text-align: center;
+            background: #0f0f14;
+            color: white;
         }
 
         header {
-            background: #222;
-            color: white;
-            padding: 25px;
+            text-align: center;
+            padding: 35px 20px;
+            background: #17171f;
+            border-bottom: 1px solid #2b2b35;
         }
 
         header h1 {
             margin: 0;
-            font-size: 36px;
+            font-size: 42px;
         }
 
         header p {
-            margin: 8px 0 0;
-            font-size: 18px;
+            margin: 10px 0 0;
+            color: #aaa;
+            font-size: 17px;
         }
 
-        .container {
-            margin: 40px auto;
-            max-width: 900px;
+        main {
+            width: 92%;
+            max-width: 1200px;
+            margin: 35px auto;
         }
 
-        .camera-box {
-            background: black;
-            border-radius: 15px;
+        .intro {
+            margin-bottom: 25px;
+        }
+
+        .intro h2 {
+            margin-bottom: 8px;
+        }
+
+        .intro p {
+            color: #aaa;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background: #17171f;
+            border: 1px solid #2b2b35;
+            border-radius: 18px;
             overflow: hidden;
-            width: 100%;
-            max-width: 800px;
-            margin: auto;
         }
 
-        video {
+        .camera {
+            background: black;
+        }
+
+        .camera img {
             width: 100%;
             display: block;
         }
 
-        button {
-            margin-top: 25px;
-            padding: 12px 25px;
-            font-size: 18px;
-            border: none;
-            border-radius: 8px;
-            background: #222;
-            color: white;
-            cursor: pointer;
+        .info {
+            padding: 30px;
         }
 
-        button:hover {
-            background: #444;
+        .label {
+            color: #7ee787;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .mudra {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 12px 0;
+        }
+
+        .confidence {
+            font-size: 19px;
+            color: #7ee787;
+            margin-bottom: 30px;
+        }
+
+        .details {
+            border-top: 1px solid #2b2b35;
+            padding-top: 20px;
+        }
+
+        .details h3 {
+            margin-bottom: 8px;
+        }
+
+        .details p {
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        .tip {
+            margin-top: 25px;
+            padding: 15px;
+            background: #20202a;
+            border-radius: 10px;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        footer {
+            text-align: center;
+            color: #666;
+            margin: 35px 0;
+        }
+
+        @media (max-width: 850px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 32px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <header>
-        <h1>🖐️ Mudra-AI</h1>
-        <p>Bharatanatyam Mudra Recognition</p>
-    </header>
+<header>
+    <h1>🖐️ Mudra-AI</h1>
+    <p>AI-Powered Bharatanatyam Mudra Recognition</p>
+</header>
 
-    <div class="container">
+<main>
 
-        <div class="camera-box">
-            <video id="video" autoplay playsinline></video>
+    <div class="intro">
+        <h2>Live Mudra Recognition</h2>
+        <p>
+            Show your hand to the camera and Mudra-AI will identify the
+            Bharatanatyam mudra.
+        </p>
+    </div>
+
+    <div class="layout">
+
+        <!-- CAMERA -->
+        <div class="card camera">
+            <img
+                src="{{ url_for('video_feed') }}"
+                alt="Live Mudra Recognition"
+            >
         </div>
 
-        <button onclick="startCamera()">
-            Start Camera
-        </button>
+        <!-- INFORMATION -->
+        <div class="card info">
+
+            <div class="label">
+                AI Recognition
+            </div>
+
+            <div class="mudra">
+                Live Camera
+            </div>
+
+            <div class="confidence">
+                Detecting...
+            </div>
+
+            <div class="details">
+                <h3>Supported Mudras</h3>
+
+                <p>
+                    🖐️ Pataaka<br>
+                    🤚 Tripataka<br>
+                    ✋ Ardhapataaka<br>
+                    🤞 Kartari Mukham<br>
+                    🦚 Mayuram
+                </p>
+            </div>
+
+            <div class="tip">
+                💡 Keep your entire hand visible and use good lighting
+                for better recognition.
+            </div>
+
+        </div>
 
     </div>
 
-    <script>
+    <footer>
+        Mudra-AI · MediaPipe · Random Forest
+    </footer>
 
-        async function startCamera() {
-
-            try {
-
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: true
-                });
-
-                const video = document.getElementById("video");
-
-                video.srcObject = stream;
-
-            } catch (error) {
-
-                alert("Could not access camera.");
-
-                console.error(error);
-            }
-        }
-
-    </script>
+</main>
 
 </body>
 </html>

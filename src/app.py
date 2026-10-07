@@ -1,99 +1,72 @@
+import os
 import cv2
 import joblib
 import mediapipe as mp
 import numpy as np
 from collections import deque
+from flask import Flask, render_template, Response
 
+# =========================
+# PATHS
+# =========================
 
-# ============================================================
-# SETTINGS
-# ============================================================
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-MODEL_PATH = "models/mudra_classifier.pkl"
-HAND_MODEL_PATH = "models/hand_landmarker.task"
+MODEL_PATH = os.path.join(
+    BASE_DIR, "models", "mudra_classifier.pkl"
+)
+
+HAND_MODEL_PATH = os.path.join(
+    BASE_DIR, "models", "hand_landmarker.task"
+)
 
 CONFIDENCE_THRESHOLD = 50.0
 SMOOTHING_WINDOW = 7
 
 
-# ============================================================
+# =========================
 # MUDRA INFORMATION
-# ============================================================
+# =========================
 
 MUDRA_INFO = {
     "pataaka": {
-        "display_name": "Pataaka",
+        "name": "Pataaka",
         "number": "Asamyuta Hasta #1",
-        "meaning": "Flag / banner",
+        "meaning": "Flag / banner"
     },
-
     "tripataka": {
-        "display_name": "Tripataka",
+        "name": "Tripataka",
         "number": "Asamyuta Hasta #2",
-        "meaning": "Three-part flag",
+        "meaning": "Three-part flag"
     },
-
     "ardhapataka": {
-        "display_name": "Ardhapataaka",
+        "name": "Ardhapataaka",
         "number": "Asamyuta Hasta #3",
-        "meaning": "Half flag",
+        "meaning": "Half flag"
     },
-
     "kartari_mukham": {
-        "display_name": "Kartari Mukham",
+        "name": "Kartari Mukham",
         "number": "Asamyuta Hasta #4",
-        "meaning": "Scissors / opening",
+        "meaning": "Scissors / opening"
     },
-
     "mayuram": {
-        "display_name": "Mayuram",
+        "name": "Mayuram",
         "number": "Asamyuta Hasta #5",
-        "meaning": "Peacock",
+        "meaning": "Peacock"
     }
 }
 
 
-# ============================================================
-# LANDMARK NORMALIZATION
-# ============================================================
-
-def normalize_landmarks(hand):
-
-    landmarks = np.array(
-        [[lm.x, lm.y, lm.z] for lm in hand],
-        dtype=float
-    )
-
-    # Make wrist the origin
-    landmarks = landmarks - landmarks[0]
-
-    # Calculate hand size
-    distances = np.linalg.norm(landmarks, axis=1)
-
-    scale = np.max(distances)
-
-    if scale > 0:
-        landmarks = landmarks / scale
-
-    return landmarks.flatten()
-
-
-# ============================================================
+# =========================
 # LOAD MODEL
-# ============================================================
+# =========================
 
 model = joblib.load(MODEL_PATH)
 
-print("===================================")
-print("       MUDRA-AI APPLICATION")
-print("===================================")
-print("Model loaded successfully!")
-print("Classes:", model.classes_)
 
-
-# ============================================================
-# MEDIAPIPE SETUP
-# ============================================================
+# =========================
+# MEDIAPIPE
+# =========================
 
 BaseOptions = mp.tasks.BaseOptions
 HandLandmarker = mp.tasks.vision.HandLandmarker
@@ -109,302 +82,332 @@ options = HandLandmarkerOptions(
 )
 
 
-# ============================================================
-# CAMERA
-# ============================================================
+# =========================
+# NORMALIZE LANDMARKS
+# =========================
 
-cap = cv2.VideoCapture(0)
+def normalize_landmarks(hand):
 
-if not cap.isOpened():
+    landmarks = np.array(
+        [[lm.x, lm.y, lm.z] for lm in hand],
+        dtype=float
+    )
 
-    print("Error: Could not open camera.")
-    exit()
+    landmarks = landmarks - landmarks[0]
 
+    distances = np.linalg.norm(
+        landmarks,
+        axis=1
+    )
 
-print("Camera started.")
-print("Press Q to quit.")
+    scale = np.max(distances)
 
+    if scale > 0:
+        landmarks = landmarks / scale
 
-# ============================================================
-# PREDICTION HISTORY
-# ============================================================
-
-prediction_history = deque(
-    maxlen=SMOOTHING_WINDOW
-)
-
-stable_prediction = "Detecting..."
-
-stable_confidence = 0.0
+    return landmarks.flatten()
 
 
-# ============================================================
-# MAIN LOOP
-# ============================================================
+# =========================
+# DRAW LANDMARKS
+# =========================
 
-with HandLandmarker.create_from_options(options) as landmarker:
+def draw_landmarks(frame, hand):
 
-    while cap.isOpened():
+    h, w = frame.shape[:2]
 
-        ret, frame = cap.read()
+    connections = [
+        (0,1), (1,2), (2,3), (3,4),
+        (0,5), (5,6), (6,7), (7,8),
+        (0,9), (9,10), (10,11), (11,12),
+        (0,13), (13,14), (14,15), (15,16),
+        (0,17), (17,18), (18,19), (19,20),
+        (5,9), (9,13), (13,17)
+    ]
 
-        if not ret:
+    points = []
 
-            print("Failed to read camera.")
-            break
+    for landmark in hand:
 
+        x = int(landmark.x * w)
+        y = int(landmark.y * h)
 
-        # ----------------------------------------------------
-        # Mirror camera
-        # ----------------------------------------------------
+        points.append((x, y))
 
-        frame = cv2.flip(frame, 1)
-
-
-        # ----------------------------------------------------
-        # Convert BGR → RGB
-        # ----------------------------------------------------
-
-        rgb_frame = cv2.cvtColor(
+        cv2.circle(
             frame,
-            cv2.COLOR_BGR2RGB
+            (x, y),
+            5,
+            (0, 255, 0),
+            -1
         )
 
+    for a, b in connections:
 
-        # ----------------------------------------------------
-        # MediaPipe image
-        # ----------------------------------------------------
-
-        mp_image = mp.Image(
-            image_format=mp.ImageFormat.SRGB,
-            data=rgb_frame
-        )
-
-
-        # ----------------------------------------------------
-        # Detect hand
-        # ----------------------------------------------------
-
-        result = landmarker.detect(mp_image)
-
-
-        # ====================================================
-        # HAND DETECTED
-        # ====================================================
-
-        if result.hand_landmarks:
-
-            hand = result.hand_landmarks[0]
-
-
-            # ------------------------------------------------
-            # Draw landmarks
-            # ------------------------------------------------
-
-            for landmark in hand:
-
-                x = int(
-                    landmark.x * frame.shape[1]
-                )
-
-                y = int(
-                    landmark.y * frame.shape[0]
-                )
-
-                cv2.circle(
-                    frame,
-                    (x, y),
-                    4,
-                    (0, 255, 0),
-                    -1
-                )
-
-
-            # ------------------------------------------------
-            # Normalize landmarks
-            # ------------------------------------------------
-
-            features = normalize_landmarks(hand)
-
-            X = features.reshape(1, -1)
-
-
-            # ------------------------------------------------
-            # Predict
-            # ------------------------------------------------
-
-            prediction = model.predict(X)[0]
-
-            probabilities = model.predict_proba(X)[0]
-
-            confidence = np.max(probabilities) * 100
-
-
-            # =================================================
-            # CONFIDENCE CHECK
-            # =================================================
-
-            if confidence >= CONFIDENCE_THRESHOLD:
-
-                prediction_history.append(prediction)
-
-
-                # Count predictions
-                counts = {}
-
-                for p in prediction_history:
-
-                    counts[p] = counts.get(p, 0) + 1
-
-
-                # Most common prediction
-                stable_prediction = max(
-                    counts,
-                    key=counts.get
-                )
-
-
-                stable_confidence = confidence
-
-
-            # =================================================
-            # DISPLAY
-            # =================================================
-
-            if stable_prediction in MUDRA_INFO:
-
-                info = MUDRA_INFO[
-                    stable_prediction
-                ]
-
-                display_name = info[
-                    "display_name"
-                ]
-
-                number = info[
-                    "number"
-                ]
-
-                meaning = info[
-                    "meaning"
-                ]
-
-
-                # Mudra name
-                cv2.putText(
-                    frame,
-                    f"Mudra: {display_name}",
-                    (20, 45),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    1,
-                    (0, 255, 0),
-                    2
-                )
-
-
-                # Confidence
-                cv2.putText(
-                    frame,
-                    f"Confidence: {stable_confidence:.1f}%",
-                    (20, 85),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.8,
-                    (0, 255, 0),
-                    2
-                )
-
-
-                # Asamyuta number
-                cv2.putText(
-                    frame,
-                    number,
-                    (20, 120),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.7,
-                    (255, 255, 255),
-                    2
-                )
-
-
-                # Meaning
-                cv2.putText(
-                    frame,
-                    f"Meaning: {meaning}",
-                    (20, 155),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.7,
-                    (255, 255, 255),
-                    2
-                )
-
-
-        # ====================================================
-        # NO HAND
-        # ====================================================
-
-        else:
-
-            prediction_history.clear()
-
-            stable_prediction = "No hand detected"
-
-            stable_confidence = 0.0
-
-
-            cv2.putText(
-                frame,
-                "No hand detected",
-                (20, 45),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                1,
-                (0, 0, 255),
-                2
-            )
-
-
-        # ====================================================
-        # APP TITLE
-        # ====================================================
-
-        cv2.putText(
+        cv2.line(
             frame,
-            "MUDRA-AI",
-            (frame.shape[1] - 180, 40),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.8,
-            (255, 255, 255),
+            points[a],
+            points[b],
+            (0, 255, 0),
             2
         )
 
 
-        # ====================================================
-        # SHOW CAMERA
-        # ====================================================
+# =========================
+# VIDEO STREAM
+# =========================
 
-        cv2.imshow(
-            "Mudra-AI",
-            frame
+def generate_frames():
+
+    cap = cv2.VideoCapture(0)
+
+    prediction_history = deque(
+        maxlen=SMOOTHING_WINDOW
+    )
+
+    stable_prediction = None
+    stable_confidence = 0
+
+    with HandLandmarker.create_from_options(options) as landmarker:
+
+        while True:
+
+            success, frame = cap.read()
+
+            if not success:
+                break
+
+            # Mirror camera
+            frame = cv2.flip(frame, 1)
+
+            # BGR → RGB
+            rgb_frame = cv2.cvtColor(
+                frame,
+                cv2.COLOR_BGR2RGB
+            )
+
+            mp_image = mp.Image(
+                image_format=mp.ImageFormat.SRGB,
+                data=rgb_frame
+            )
+
+            result = landmarker.detect(mp_image)
+
+
+            # =========================
+            # HAND DETECTED
+            # =========================
+
+            if result.hand_landmarks:
+
+                hand = result.hand_landmarks[0]
+
+                draw_landmarks(
+                    frame,
+                    hand
+                )
+
+                # Normalize
+                features = normalize_landmarks(
+                    hand
+                )
+
+                X = features.reshape(
+                    1, -1
+                )
+
+                # Prediction
+                prediction = model.predict(X)[0]
+
+                probabilities = model.predict_proba(X)[0]
+
+                confidence = (
+                    np.max(probabilities) * 100
+                )
+
+                # Confidence filtering
+                if confidence >= CONFIDENCE_THRESHOLD:
+
+                    prediction_history.append(
+                        prediction
+                    )
+
+                    counts = {}
+
+                    for p in prediction_history:
+                        counts[p] = counts.get(p, 0) + 1
+
+                    stable_prediction = max(
+                        counts,
+                        key=counts.get
+                    )
+
+                    stable_confidence = confidence
+
+
+                # =========================
+                # DISPLAY
+                # =========================
+
+                if stable_prediction in MUDRA_INFO:
+
+                    info = MUDRA_INFO[
+                        stable_prediction
+                    ]
+
+                    # Background panel
+                    cv2.rectangle(
+                        frame,
+                        (15, 15),
+                        (450, 155),
+                        (20, 20, 20),
+                        -1
+                    )
+
+                    # Mudra name
+                    cv2.putText(
+                        frame,
+                        info["name"],
+                        (30, 55),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        1.1,
+                        (0, 255, 0),
+                        3
+                    )
+
+                    # Number
+                    cv2.putText(
+                        frame,
+                        info["number"],
+                        (30, 85),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.65,
+                        (255, 255, 255),
+                        2
+                    )
+
+                    # Confidence
+                    cv2.putText(
+                        frame,
+                        f"Confidence: {stable_confidence:.1f}%",
+                        (30, 115),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.65,
+                        (0, 255, 0),
+                        2
+                    )
+
+                    # Meaning
+                    cv2.putText(
+                        frame,
+                        info["meaning"],
+                        (30, 145),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.55,
+                        (220, 220, 220),
+                        1
+                    )
+
+                else:
+
+                    cv2.putText(
+                        frame,
+                        "Analyzing...",
+                        (25, 50),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.8,
+                        (255, 255, 255),
+                        2
+                    )
+
+
+            # =========================
+            # NO HAND
+            # =========================
+
+            else:
+
+                prediction_history.clear()
+
+                stable_prediction = None
+                stable_confidence = 0
+
+                cv2.putText(
+                    frame,
+                    "Show your hand",
+                    (25, 50),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.8,
+                    (255, 255, 255),
+                    2
+                )
+
+
+            # =========================
+            # ENCODE FRAME
+            # =========================
+
+            success, buffer = cv2.imencode(
+                ".jpg",
+                frame
+            )
+
+            if not success:
+                continue
+
+            frame_bytes = buffer.tobytes()
+
+            yield (
+                b"--frame\r\n"
+                b"Content-Type: image/jpeg\r\n\r\n"
+                + frame_bytes
+                + b"\r\n"
+            )
+
+    cap.release()
+
+
+# =========================
+# FLASK APP
+# =========================
+
+app = Flask(
+    __name__,
+    template_folder=os.path.join(
+        BASE_DIR,
+        "templates"
+    )
+)
+
+
+@app.route("/")
+def home():
+
+    return render_template(
+        "index.html"
+    )
+
+
+@app.route("/video_feed")
+def video_feed():
+
+    return Response(
+        generate_frames(),
+        mimetype=(
+            "multipart/x-mixed-replace; "
+            "boundary=frame"
         )
+    )
 
 
-        # ====================================================
-        # QUIT
-        # ====================================================
+# =========================
+# RUN
+# =========================
 
-        key = cv2.waitKey(1) & 0xFF
+if __name__ == "__main__":
 
-        if key == ord("q"):
-
-            break
-
-
-# ============================================================
-# CLEANUP
-# ============================================================
-
-cap.release()
-
-cv2.destroyAllWindows()
-
-print("Camera closed.")
-print("Mudra-AI application stopped.")
+    app.run(
+        host="127.0.0.1",
+        port=5000,
+        debug=False
+    )
