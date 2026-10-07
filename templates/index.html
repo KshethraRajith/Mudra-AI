@@ -3,212 +3,526 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mudra-AI | Bharatanatyam Mudra Recognition</title>
 
-    <title>Mudra-AI | Bharatanatyam Recognition</title>
+    <!-- Google Fonts: Classical Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #0f0f14;
-            color: white;
-        }
-
-        header {
-            text-align: center;
-            padding: 35px 20px;
-            background: #17171f;
-            border-bottom: 1px solid #2b2b35;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 42px;
-        }
-
-        header p {
-            margin: 10px 0 0;
-            color: #aaa;
-            font-size: 17px;
-        }
-
-        main {
-            width: 92%;
-            max-width: 1200px;
-            margin: 35px auto;
-        }
-
-        .intro {
-            margin-bottom: 25px;
-        }
-
-        .intro h2 {
-            margin-bottom: 8px;
-        }
-
-        .intro p {
-            color: #aaa;
-        }
-
-        .layout {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 25px;
-        }
-
-        .card {
-            background: #17171f;
-            border: 1px solid #2b2b35;
-            border-radius: 18px;
-            overflow: hidden;
-        }
-
-        .camera {
-            background: black;
-        }
-
-        .camera img {
-            width: 100%;
-            display: block;
-        }
-
-        .info {
-            padding: 30px;
-        }
-
-        .label {
-            color: #7ee787;
-            font-size: 13px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .mudra {
-            font-size: 36px;
-            font-weight: bold;
-            margin: 12px 0;
-        }
-
-        .confidence {
-            font-size: 19px;
-            color: #7ee787;
-            margin-bottom: 30px;
-        }
-
-        .details {
-            border-top: 1px solid #2b2b35;
-            padding-top: 20px;
-        }
-
-        .details h3 {
-            margin-bottom: 8px;
-        }
-
-        .details p {
-            color: #aaa;
-            line-height: 1.6;
-        }
-
-        .tip {
-            margin-top: 25px;
-            padding: 15px;
-            background: #20202a;
-            border-radius: 10px;
-            color: #aaa;
-            font-size: 14px;
-        }
-
-        footer {
-            text-align: center;
-            color: #666;
-            margin: 35px 0;
-        }
-
-        @media (max-width: 850px) {
-            .layout {
-                grid-template-columns: 1fr;
-            }
-
-            header h1 {
-                font-size: 32px;
-            }
-        }
-    </style>
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/branding/logo.png') }}">
 </head>
-
 <body>
 
-<header>
-    <h1>🖐️ Mudra-AI</h1>
-    <p>AI-Powered Bharatanatyam Mudra Recognition</p>
-</header>
-
-<main>
-
-    <div class="intro">
-        <h2>Live Mudra Recognition</h2>
-        <p>
-            Show your hand to the camera and Mudra-AI will identify the
-            Bharatanatyam mudra.
-        </p>
-    </div>
-
-    <div class="layout">
-
-        <!-- CAMERA -->
-        <div class="card camera">
-            <img
-                src="{{ url_for('video_feed') }}"
-                alt="Live Mudra Recognition"
+    <!-- =======================================================================
+         HEADER SECTION
+         ======================================================================= -->
+    <header class="site-header">
+        <!-- Background Artistic Silhouette Overlays -->
+        <div class="header-bg-overlay">
+            <img 
+                src="{{ url_for('static', filename='images/branding/dancer_clean.png') }}" 
+                alt="" 
+                class="dancer-silhouette" 
+                aria-hidden="true"
+            >
+            <img 
+                src="{{ url_for('static', filename='images/branding/lotus_clean.png') }}" 
+                alt="" 
+                class="lotus-watermark" 
+                aria-hidden="true"
             >
         </div>
 
-        <!-- INFORMATION -->
-        <div class="card info">
-
-            <div class="label">
-                AI Recognition
+        <div class="header-container">
+            <!-- Left Branding -->
+            <div class="brand-group">
+                <div class="brand-logo-wrap">
+                    <img 
+                        src="{{ url_for('static', filename='images/branding/logo.png') }}" 
+                        alt="Mudra-AI Logo" 
+                        class="brand-logo"
+                    >
+                </div>
+                <div class="brand-title-wrap">
+                    <h1 class="brand-name">Mudra-AI</h1>
+                    <span class="brand-subtitle">Bharatanatyam Mudra Recognition</span>
+                </div>
             </div>
 
-            <div class="mudra">
-                Live Camera
+            <!-- Right Cultural Tagline -->
+            <div class="tagline-group">
+                <div class="tagline-main">Tradition Meets Technology</div>
+                <div class="tagline-sub">PRESERVE &nbsp;•&nbsp; RECOGNIZE &nbsp;•&nbsp; LEARN</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- =======================================================================
+         MAIN WORKSPACE
+         ======================================================================= -->
+    <main class="main-content">
+
+        <!-- Top Grid: Left Camera + Right Recognition Card -->
+        <section class="top-workspace-grid">
+
+            <!-- Camera Card (Left) -->
+            <div class="mudra-panel-card camera-card">
+                <!-- Live Indicator Pill (Top-Left) -->
+                <div class="camera-badge-live">
+                    <span class="live-dot"></span>
+                    <span>Live Camera</span>
+                </div>
+
+                <!-- Video Stream -->
+                <img 
+                    id="camera-stream" 
+                    src="{{ url_for('video_feed') }}" 
+                    alt="Live Hand Mudra Recognition" 
+                    class="camera-stream"
+                >
+
+                <!-- Guidance Tip Pill (Bottom-Left) -->
+                <div class="camera-badge-tip" id="camera-tip">
+                    <span class="tip-bulb-icon">💡</span>
+                    <span id="camera-tip-text">Show your hand clearly to the camera</span>
+                </div>
             </div>
 
-            <div class="confidence">
-                Detecting...
+            <!-- Recognized Mudra Card (Right) -->
+            <div class="mudra-panel-card recognition-card">
+                
+                <div>
+                    <!-- Mini Tag Header -->
+                    <div class="card-mini-tag">
+                        <img 
+                            src="{{ url_for('static', filename='images/branding/lotus_gold.png') }}" 
+                            alt="" 
+                            class="tag-lotus-icon"
+                        >
+                        <span>RECOGNIZED MUDRA</span>
+                    </div>
+
+                    <!-- Mudra Title & Category & Confidence & Reference Photo -->
+                    <div class="mudra-hero-row">
+                        <!-- Left Info -->
+                        <div class="mudra-info-left">
+                            <h2 id="mudra-name" class="mudra-main-title">{{ initial.name }}</h2>
+                            <div id="mudra-number" class="asamyuta-pill">{{ initial.number }}</div>
+
+                            <!-- Confidence Metric -->
+                            <div class="confidence-box">
+                                <div class="conf-meta-row">
+                                    <svg class="conf-signal-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M18 20V10M12 20V4M6 20v-6"></path>
+                                    </svg>
+                                    <span class="conf-label">Confidence:</span>
+                                    <span id="conf-val" class="conf-percent-value">{{ initial.confidence }}%</span>
+                                </div>
+                                <div class="confidence-track">
+                                    <div id="conf-bar" class="confidence-bar-fill" style="width: {{ initial.confidence }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Reference Image Card -->
+                        <div class="ref-photo-card">
+                            <img 
+                                id="ref-img" 
+                                src="{{ initial.ref_image }}" 
+                                alt="{{ initial.name }} Reference Hand" 
+                                class="ref-photo-img"
+                            >
+                            <div id="ref-caption" class="ref-photo-name">{{ initial.name }}</div>
+                            <div class="ref-photo-flourish">― ꕥ ―</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Divider -->
+                <div class="card-section-divider"></div>
+
+                <!-- Structured Mudra Details List -->
+                <div class="mudra-details-list">
+                    <!-- Meaning -->
+                    <div class="detail-row">
+                        <div class="detail-icon-wrap">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="detail-label">Meaning</div>
+                        <div id="mudra-meaning" class="detail-value">{{ initial.meaning }}</div>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="detail-row">
+                        <div class="detail-icon-wrap">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                        </div>
+                        <div class="detail-label">Category</div>
+                        <div id="mudra-category" class="detail-value">{{ initial.category }}</div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="detail-row">
+                        <div class="detail-icon-wrap">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                        </div>
+                        <div class="detail-label">Description</div>
+                        <div id="mudra-description" class="detail-value">{{ initial.description }}</div>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="details">
-                <h3>Supported Mudras</h3>
+        </section>
 
-                <p>
-                    🖐️ Pataaka<br>
-                    🤚 Tripataka<br>
-                    ✋ Ardhapataaka<br>
-                    🤞 Kartari Mukham<br>
-                    🦚 Mayuram
+        <!-- Bottom Row: Supported Mudras -->
+        <section class="mudra-panel-card supported-mudras-panel">
+            <div class="supported-panel-header">
+                <div class="supported-title-group">
+                    <img 
+                        src="{{ url_for('static', filename='images/branding/lotus_rose.png') }}" 
+                        alt="" 
+                        class="supported-lotus-icon"
+                    >
+                    <h3 class="supported-heading-text">Supported Mudras</h3>
+                </div>
+
+                <!-- Educational Link -->
+                <button type="button" class="learn-more-btn" id="open-guide-btn">
+                    <span class="learn-more-icon">📖</span>
+                    <span>Learn More About Bharatanatyam Mudras</span>
+                    <span class="learn-more-arrow">→</span>
+                </button>
+            </div>
+
+            <!-- Mudras 5 Cards Grid -->
+            <div class="mudras-cards-grid">
+                
+                <!-- 1. Pataaka -->
+                <div class="mudra-thumb-card active" data-id="pataaka" onclick="selectMudra('pataaka')">
+                    <div class="mudra-card-image-wrap">
+                        <img 
+                            src="{{ url_for('static', filename='images/mudras/pataaka_card.jpg') }}" 
+                            alt="Pataaka" 
+                            class="mudra-card-img"
+                        >
+                    </div>
+                    <div class="mudra-card-meta">
+                        <span class="mudra-card-name">Pataaka</span>
+                        <span class="mudra-card-number">Asamyuta Hasta #1</span>
+                    </div>
+                </div>
+
+                <!-- 2. Tripataka -->
+                <div class="mudra-thumb-card" data-id="tripataka" onclick="selectMudra('tripataka')">
+                    <div class="mudra-card-image-wrap">
+                        <img 
+                            src="{{ url_for('static', filename='images/mudras/tripataka_card.jpg') }}" 
+                            alt="Tripataka" 
+                            class="mudra-card-img"
+                        >
+                    </div>
+                    <div class="mudra-card-meta">
+                        <span class="mudra-card-name">Tripataka</span>
+                        <span class="mudra-card-number">Asamyuta Hasta #2</span>
+                    </div>
+                </div>
+
+                <!-- 3. Ardhapataaka -->
+                <div class="mudra-thumb-card" data-id="ardhapataka" onclick="selectMudra('ardhapataka')">
+                    <div class="mudra-card-image-wrap">
+                        <img 
+                            src="{{ url_for('static', filename='images/mudras/ardhapataka_card.jpg') }}" 
+                            alt="Ardhapataaka" 
+                            class="mudra-card-img"
+                        >
+                    </div>
+                    <div class="mudra-card-meta">
+                        <span class="mudra-card-name">Ardhapataaka</span>
+                        <span class="mudra-card-number">Asamyuta Hasta #3</span>
+                    </div>
+                </div>
+
+                <!-- 4. Kartari Mukham -->
+                <div class="mudra-thumb-card" data-id="kartari_mukham" onclick="selectMudra('kartari_mukham')">
+                    <div class="mudra-card-image-wrap">
+                        <img 
+                            src="{{ url_for('static', filename='images/mudras/kartari_mukham_card.jpg') }}" 
+                            alt="Kartari Mukham" 
+                            class="mudra-card-img"
+                        >
+                    </div>
+                    <div class="mudra-card-meta">
+                        <span class="mudra-card-name">Kartari Mukham</span>
+                        <span class="mudra-card-number">Asamyuta Hasta #4</span>
+                    </div>
+                </div>
+
+                <!-- 5. Mayuram -->
+                <div class="mudra-thumb-card" data-id="mayuram" onclick="selectMudra('mayuram')">
+                    <div class="mudra-card-image-wrap">
+                        <img 
+                            src="{{ url_for('static', filename='images/mudras/mayuram_card.jpg') }}" 
+                            alt="Mayuram" 
+                            class="mudra-card-img"
+                        >
+                    </div>
+                    <div class="mudra-card-meta">
+                        <span class="mudra-card-name">Mayuram</span>
+                        <span class="mudra-card-number">Asamyuta Hasta #5</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =======================================================================
+         FOOTER
+         ======================================================================= -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <img 
+                src="{{ url_for('static', filename='images/branding/lotus_gold.png') }}" 
+                alt="" 
+                class="footer-lotus-icon"
+            >
+            <span>Mudra-AI &nbsp;|&nbsp; AI for Indian Classical Arts &nbsp;|&nbsp; Built with MediaPipe &amp; Random Forest</span>
+        </div>
+    </footer>
+
+    <!-- =======================================================================
+         EDUCATIONAL MODAL: "LEARN MORE ABOUT BHARATANATYAM MUDRAS"
+         ======================================================================= -->
+    <div class="modal-backdrop" id="guide-modal" aria-hidden="true">
+        <div class="modal-card">
+            <button type="button" class="modal-close-btn" id="close-guide-btn" aria-label="Close modal">✕</button>
+            
+            <div class="modal-header-section">
+                <h2 class="modal-title">Bharatanatyam Hasta Mudras</h2>
+                <div class="modal-subtitle">Ancient Language of Hands from the Abhinaya Darpana</div>
+                <p class="modal-intro-text">
+                    In classical Indian dance, <em>Hastas</em> (hand gestures) form a sacred visual alphabet. 
+                    Rooted in the <strong>Natya Shastra</strong> and codified in Nandikeshvara's <strong>Abhinaya Darpana</strong>, 
+                    the single-hand gestures (<em>Asamyuta Hastas</em>) convey poetry, mythology, nature, and divine emotion.
                 </p>
             </div>
 
-            <div class="tip">
-                💡 Keep your entire hand visible and use good lighting
-                for better recognition.
+            <div class="modal-mudra-guide-grid">
+                
+                <!-- 1. Pataaka -->
+                <div class="guide-item-card">
+                    <img src="{{ url_for('static', filename='images/mudras/pataaka_ref.jpg') }}" alt="Pataaka" class="guide-item-photo">
+                    <div class="guide-item-content">
+                        <h3>Pataaka <span class="guide-badge">Asamyuta Hasta #1</span></h3>
+                        <div class="guide-shloka">"Nāṭyārambhe vāridhare vane vastuniṣedhane..."</div>
+                        <p class="guide-desc">
+                            All five fingers are extended straight and held close together, with the thumb gently bent touching the edge of the palm. Used at the beginning of a dance performance, to depict clouds, dense forests, forbidding/stopping, night, river, and divine blessings.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 2. Tripataka -->
+                <div class="guide-item-card">
+                    <img src="{{ url_for('static', filename='images/mudras/tripataka_ref.jpg') }}" alt="Tripataka" class="guide-item-photo">
+                    <div class="guide-item-content">
+                        <h3>Tripataka <span class="guide-badge">Asamyuta Hasta #2</span></h3>
+                        <div class="guide-shloka">"Makuṭe vṛkṣabhāve ca vajre tattaddhare tathā..."</div>
+                        <p class="guide-desc">
+                            Derived from Pataaka by bending down only the ring finger. Signifies a royal crown (makuta), a sacred tree, Indra's thunderbolt (vajra), the third part of a flag, arrows, or holy lamps.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 3. Ardhapataaka -->
+                <div class="guide-item-card">
+                    <img src="{{ url_for('static', filename='images/mudras/ardhapataka_ref.jpg') }}" alt="Ardhapataaka" class="guide-item-photo">
+                    <div class="guide-item-content">
+                        <h3>Ardhapataaka <span class="guide-badge">Asamyuta Hasta #3</span></h3>
+                        <div class="guide-shloka">"Pallave phalake tīre ubhayoriti vācakaḥ..."</div>
+                        <p class="guide-desc">
+                            From Tripataka, the little finger is also bent down alongside the ring finger. Signifies tender tender leaves (pallava), writing boards, temple towers, animal horns, or the twin banks of a river.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 4. Kartari Mukham -->
+                <div class="guide-item-card">
+                    <img src="{{ url_for('static', filename='images/mudras/kartari_mukham_ref.jpg') }}" alt="Kartari Mukham" class="guide-item-photo">
+                    <div class="guide-item-content">
+                        <h3>Kartari Mukham <span class="guide-badge">Asamyuta Hasta #4</span></h3>
+                        <div class="guide-shloka">"Strīpuṁsayostu viśleṣe viparyāsapade'pi ca..."</div>
+                        <p class="guide-desc">
+                            The index and middle fingers are spread apart like scissor blades, while the thumb joins the bent ring and little fingers. Depicts the pain of separation between lovers, sudden lightning, the outer corners of eyes, or a fall.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 5. Mayuram -->
+                <div class="guide-item-card">
+                    <img src="{{ url_for('static', filename='images/mudras/mayuram_ref.jpg') }}" alt="Mayuram" class="guide-item-photo">
+                    <div class="guide-item-content">
+                        <h3>Mayuram <span class="guide-badge">Asamyuta Hasta #5</span></h3>
+                        <div class="guide-shloka">"Mayūragalake lekhāyāṁ śakune yukte..."</div>
+                        <p class="guide-desc">
+                            The tip of the ring finger touches the tip of the thumb, while other fingers are upright. Depicts the graceful neck of a dancing peacock, applying the auspicious tilak/bindi to the forehead, good omens, or stroking hair.
+                        </p>
+                    </div>
+                </div>
+
             </div>
-
         </div>
-
     </div>
 
-    <footer>
-        Mudra-AI · MediaPipe · Random Forest
-    </footer>
+    <!-- =======================================================================
+         INTERACTIVE JAVASCRIPT: REAL-TIME UPDATES & SYNC
+         ======================================================================= -->
+    <script>
+        // DOM Elements
+        const elMudraName = document.getElementById('mudra-name');
+        const elMudraNumber = document.getElementById('mudra-number');
+        const elConfVal = document.getElementById('conf-val');
+        const elConfBar = document.getElementById('conf-bar');
+        const elRefImg = document.getElementById('ref-img');
+        const elRefCaption = document.getElementById('ref-caption');
+        const elMudraMeaning = document.getElementById('mudra-meaning');
+        const elMudraCategory = document.getElementById('mudra-category');
+        const elMudraDescription = document.getElementById('mudra-description');
+        const elCameraTipText = document.getElementById('camera-tip-text');
+        
+        const modalBackdrop = document.getElementById('guide-modal');
+        const btnOpenGuide = document.getElementById('open-guide-btn');
+        const btnCloseGuide = document.getElementById('close-guide-btn');
 
-</main>
+        let currentActiveId = 'pataaka';
+        let isUserManualSelecting = false;
+        let manualTimeout = null;
 
+        // Highlight Active Mudra in bottom row
+        function setActiveCard(mudraId) {
+            currentActiveId = mudraId;
+            document.querySelectorAll('.mudra-thumb-card').forEach(card => {
+                if (card.dataset.id === mudraId) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            });
+        }
+
+        // Apply recognition state to UI
+        function updateUI(data) {
+            if (!data) return;
+
+            if (data.name && elMudraName.textContent !== data.name) {
+                elMudraName.textContent = data.name;
+                elRefCaption.textContent = data.name;
+            }
+
+            if (data.number) elMudraNumber.textContent = data.number;
+
+            const conf = typeof data.confidence === 'number' ? data.confidence : parseFloat(data.confidence) || 0;
+            elConfVal.textContent = conf.toFixed(1) + '%';
+            elConfBar.style.width = Math.min(Math.max(conf, 5), 100) + '%';
+
+            if (data.ref_image && elRefImg.getAttribute('src') !== data.ref_image) {
+                elRefImg.src = data.ref_image;
+            }
+
+            if (data.meaning) elMudraMeaning.textContent = data.meaning;
+            if (data.category) elMudraCategory.textContent = data.category;
+            if (data.description) elMudraDescription.textContent = data.description;
+
+            // Update camera guidance badge
+            if (data.hand_in_frame) {
+                elCameraTipText.textContent = "✨ Hand detected - recognizing mudra...";
+            } else {
+                elCameraTipText.textContent = "💡 Show your hand clearly to the camera";
+            }
+
+            // Sync active card in bottom row
+            if (data.mudra_id && data.mudra_id !== currentActiveId) {
+                setActiveCard(data.mudra_id);
+            }
+        }
+
+        // User clicking a card manually to preview
+        function selectMudra(mudraId) {
+            isUserManualSelecting = true;
+            clearTimeout(manualTimeout);
+            setActiveCard(mudraId);
+
+            fetch(`/api/select/${mudraId}`)
+                .then(res => res.json())
+                .then(data => {
+                    // Let user preview for 3.5 seconds before resuming camera overrides
+                    manualTimeout = setTimeout(() => {
+                        isUserManualSelecting = false;
+                    }, 3500);
+                })
+                .catch(err => console.error("Error selecting mudra:", err));
+        }
+
+        // Live polling from backend
+        async function pollStatus() {
+            try {
+                if (!isUserManualSelecting) {
+                    const response = await fetch('/api/status');
+                    if (response.ok) {
+                        const data = await response.json();
+                        updateUI(data);
+                    }
+                }
+            } catch (err) {
+                // Backend momentarily reconnecting
+            } finally {
+                setTimeout(pollStatus, 150);
+            }
+        }
+
+        // Start polling
+        pollStatus();
+
+        // Modal Controls
+        btnOpenGuide.addEventListener('click', () => {
+            modalBackdrop.classList.add('open');
+            modalBackdrop.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        });
+
+        function closeModal() {
+            modalBackdrop.classList.remove('open');
+            modalBackdrop.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        btnCloseGuide.addEventListener('click', closeModal);
+
+        modalBackdrop.addEventListener('click', (e) => {
+            if (e.target === modalBackdrop) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalBackdrop.classList.contains('open')) {
+                closeModal();
+            }
+        });
+    </script>
 </body>
 </html>

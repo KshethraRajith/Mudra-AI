@@ -1,0 +1,899 @@
+/* ==========================================================================
+   Mudra-AI: Bharatanatyam Mudra Recognition - Theme & Styles
+   Aesthetic: Heritage Indian Classical Luxury Dark Mode
+   ========================================================================== */
+
+:root {
+    --bg-main: #0c090c;
+    --bg-header: #0d0a0d;
+    --bg-card: #151014;
+    --bg-card-inner: #100c0f;
+    --bg-card-alt: #191318;
+    
+    --border-subtle: #2b2025;
+    --border-accent-gold: #c5a059;
+    --border-gold-soft: rgba(197, 160, 89, 0.4);
+    --border-active-rose: #d9777f;
+    --border-badge-green: #23502b;
+    
+    --text-primary: #fbf8f5;
+    --text-secondary: #9c8f94;
+    --text-muted: #6e6065;
+    --text-gold: #c5a059;
+    --text-gold-light: #dfc590;
+    --text-green: #7ee787;
+    
+    --badge-green-bg: #142918;
+    --badge-tip-bg: rgba(22, 16, 21, 0.82);
+    
+    --glow-rose: 0 0 16px rgba(217, 119, 127, 0.38);
+    --glow-green: 0 0 10px rgba(126, 231, 135, 0.45);
+    
+    --font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+    --font-heading: 'Cinzel', 'Playfair Display', Georgia, serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+/* ==========================================================================
+   HEADER SECTION
+   ========================================================================== */
+
+.site-header {
+    position: relative;
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 24px 0;
+    overflow: hidden;
+}
+
+/* Background artistic illustrations */
+.header-bg-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.dancer-silhouette {
+    position: absolute;
+    top: -10px;
+    left: 0;
+    height: 120%;
+    max-height: 140px;
+    opacity: 0.55;
+    object-fit: contain;
+    mix-blend-mode: screen;
+}
+
+.lotus-watermark {
+    position: absolute;
+    top: 0;
+    left: 420px;
+    height: 110%;
+    max-height: 130px;
+    opacity: 0.28;
+    mix-blend-mode: screen;
+}
+
+.header-container {
+    position: relative;
+    z-index: 2;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Left Brand Branding */
+.brand-group {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.brand-logo-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-logo {
+    height: 68px;
+    width: auto;
+    filter: drop-shadow(0 2px 8px rgba(197, 160, 89, 0.35));
+    transition: transform 0.3s ease;
+}
+
+.brand-logo:hover {
+    transform: scale(1.04);
+}
+
+.brand-title-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-name {
+    font-family: var(--font-heading);
+    font-size: 38px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+}
+
+.brand-subtitle {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 400;
+    color: #b5a49c;
+    letter-spacing: 0.2px;
+    margin-top: 3px;
+}
+
+/* Right Tagline */
+.tagline-group {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.tagline-main {
+    font-family: var(--font-serif);
+    font-size: 21px;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--text-gold);
+    letter-spacing: 0.8px;
+    line-height: 1.2;
+}
+
+.tagline-sub {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 600;
+    color: #8c7b74;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 5px;
+}
+
+/* ==========================================================================
+   MAIN WORKSPACE
+   ========================================================================== */
+
+.main-content {
+    flex: 1;
+    max-width: 1240px;
+    width: 100%;
+    margin: 28px auto 20px;
+    padding: 0 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Two Columns Top Row */
+.top-workspace-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 22px;
+    align-items: stretch;
+}
+
+/* Base Card Style */
+.mudra-panel-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* ==========================================================================
+   CAMERA CARD (LEFT)
+   ========================================================================== */
+
+.camera-card {
+    position: relative;
+    background: #080608;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 420px;
+}
+
+.camera-stream {
+    width: 100%;
+    height: 100%;
+    min-height: 420px;
+    object-fit: cover;
+    display: block;
+    background: #000;
+}
+
+/* Live Camera Pill Badge (Top-Left) */
+.camera-badge-live {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(14, 11, 14, 0.78);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+    padding: 6px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    z-index: 10;
+}
+
+.live-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background-color: #22c55e;
+    box-shadow: 0 0 10px #22c55e;
+    animation: livePulse 2s infinite ease-in-out;
+}
+
+@keyframes livePulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.25);
+        opacity: 0.75;
+    }
+}
+
+/* Hand Guidance Pill Badge (Bottom-Left) */
+.camera-badge-tip {
+    position: absolute;
+    bottom: 18px;
+    left: 18px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--badge-tip-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 9999px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #ded6cf;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.tip-bulb-icon {
+    font-size: 14px;
+    filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
+}
+
+/* ==========================================================================
+   RECOGNIZED MUDRA CARD (RIGHT)
+   ========================================================================== */
+
+.recognition-card {
+    padding: 26px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Mini Tag: Lotus + RECOGNIZED MUDRA */
+.card-mini-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text-gold);
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.tag-lotus-icon {
+    width: 17px;
+    height: 17px;
+    object-fit: contain;
+}
+
+/* Main Mudra Showcase Area */
+.mudra-hero-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-top: 4px;
+}
+
+.mudra-info-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mudra-main-title {
+    font-family: var(--font-heading);
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.1;
+    letter-spacing: 0.5px;
+}
+
+/* Category Pill Badge */
+.asamyuta-pill {
+    align-self: flex-start;
+    background: var(--badge-green-bg);
+    color: var(--text-green);
+    border: 1px solid var(--border-badge-green);
+    border-radius: 9999px;
+    padding: 4px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+/* Confidence Metric Box */
+.confidence-box {
+    margin-top: 8px;
+    background: rgba(18, 14, 18, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.conf-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #e4ded9;
+}
+
+.conf-signal-icon {
+    width: 18px;
+    height: 18px;
+    stroke: var(--text-green);
+}
+
+.conf-label {
+    font-weight: 500;
+}
+
+.conf-percent-value {
+    color: var(--text-green);
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.confidence-track {
+    width: 100%;
+    height: 7px;
+    background: #1e181e;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.confidence-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #22c55e 0%, #7ee787 100%);
+    box-shadow: var(--glow-green);
+    border-radius: 9999px;
+    transition: width 0.35s ease;
+}
+
+/* Reference Photo Thumbnail (Top-Right) */
+.ref-photo-card {
+    width: 124px;
+    flex-shrink: 0;
+    background: #0a080a;
+    border: 1px solid var(--border-accent-gold);
+    border-radius: 12px;
+    padding: 5px;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+.ref-photo-img {
+    width: 100%;
+    height: 124px;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+    background: #000;
+}
+
+.ref-photo-name {
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 600;
+    color: #f3eae4;
+    margin-top: 6px;
+}
+
+.ref-photo-flourish {
+    color: #a0845a;
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin-top: 1px;
+}
+
+/* Divider Line */
+.card-section-divider {
+    height: 1px;
+    background: var(--border-subtle);
+    margin: 20px 0 16px;
+}
+
+/* Mudra Details List */
+.mudra-details-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.detail-row {
+    display: grid;
+    grid-template-columns: 24px 105px 1fr;
+    align-items: start;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.detail-icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9e898f;
+    font-size: 15px;
+    margin-top: 2px;
+}
+
+.detail-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.detail-value {
+    color: #f0eae5;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   BOTTOM ROW: SUPPORTED MUDRAS
+   ========================================================================== */
+
+.supported-mudras-panel {
+    padding: 24px 28px;
+}
+
+.supported-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.supported-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.supported-lotus-icon {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+}
+
+.supported-heading-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.3px;
+}
+
+/* Learn More Pill Button */
+.learn-more-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(30, 22, 28, 0.7);
+    border: 1px solid #4a343d;
+    border-radius: 9999px;
+    padding: 8px 18px;
+    color: #dfc2c8;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.learn-more-btn:hover {
+    background: rgba(45, 32, 42, 0.9);
+    border-color: var(--border-accent-gold);
+    color: var(--text-gold-light);
+    transform: translateX(3px);
+    box-shadow: 0 4px 14px rgba(197, 160, 89, 0.2);
+}
+
+.learn-more-icon {
+    font-size: 14px;
+}
+
+.learn-more-arrow {
+    font-size: 14px;
+    transition: transform 0.2s ease;
+}
+
+.learn-more-btn:hover .learn-more-arrow {
+    transform: translateX(3px);
+}
+
+/* 5 Cards Row */
+.mudras-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+}
+
+.mudra-thumb-card {
+    background: var(--bg-card-inner);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    user-select: none;
+}
+
+.mudra-thumb-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-accent-gold);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+
+/* Active Highlighted State matching screenshot (Glowing Rose-Gold) */
+.mudra-thumb-card.active {
+    border: 1.5px solid var(--border-active-rose);
+    box-shadow: var(--glow-rose), inset 0 0 10px rgba(217, 119, 127, 0.15);
+    background: #181116;
+}
+
+.mudra-card-image-wrap {
+    width: 100%;
+    height: 94px;
+    background: #080608;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.mudra-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.mudra-thumb-card:hover .mudra-card-img {
+    transform: scale(1.05);
+}
+
+.mudra-card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.mudra-card-name {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.mudra-card-number {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+
+.site-footer {
+    text-align: center;
+    padding: 24px 0 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    margin-top: auto;
+}
+
+.footer-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+
+.footer-lotus-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.7;
+}
+
+/* ==========================================================================
+   EDUCATIONAL MODAL: "LEARN MORE ABOUT BHARATANATYAM MUDRAS"
+   ========================================================================== */
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(6, 4, 6, 0.85);
+    backdrop-filter: blur(14px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    padding: 20px;
+}
+
+.modal-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-card {
+    background: #171116;
+    border: 1px solid var(--border-accent-gold);
+    border-radius: 20px;
+    max-width: 860px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 34px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-backdrop.open .modal-card {
+    transform: translateY(0);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 22px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e4ded9;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+    background: rgba(217, 119, 127, 0.3);
+    border-color: var(--border-active-rose);
+    color: #fff;
+    transform: scale(1.08);
+}
+
+.modal-header-section {
+    text-align: center;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.modal-title {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.modal-subtitle {
+    color: var(--text-gold);
+    font-size: 14px;
+    font-style: italic;
+    font-family: var(--font-serif);
+    margin-top: 4px;
+}
+
+.modal-intro-text {
+    color: #ccc0be;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-top: 12px;
+    text-align: center;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.modal-mudra-guide-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.guide-item-card {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 20px;
+    background: #110c10;
+    border: 1px solid #2d2127;
+    border-radius: 14px;
+    padding: 16px;
+    align-items: center;
+}
+
+.guide-item-photo {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--border-accent-gold);
+    background: #000;
+}
+
+.guide-item-content h3 {
+    font-family: var(--font-heading);
+    font-size: 17px;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.guide-badge {
+    background: var(--badge-green-bg);
+    color: var(--text-green);
+    border: 1px solid var(--border-badge-green);
+    font-size: 11px;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-weight: 600;
+}
+
+.guide-shloka {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--text-gold-light);
+    font-size: 13.5px;
+    margin-bottom: 6px;
+}
+
+.guide-desc {
+    color: #bfb0af;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+    .top-workspace-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .mudras-cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .lotus-watermark {
+        display: none;
+    }
+}
+
+@media (max-width: 720px) {
+    .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .tagline-group {
+        text-align: left;
+    }
+    
+    .mudras-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .guide-item-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .guide-item-photo {
+        margin: 0 auto;
+    }
+    
+    .mudra-hero-row {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .asamyuta-pill {
+        align-self: center;
+    }
+    
+    .ref-photo-card {
+        margin-top: 12px;
+    }
+    
+    .detail-row {
+        grid-template-columns: 24px 80px 1fr;
+        font-size: 13px;
+    }
+}
